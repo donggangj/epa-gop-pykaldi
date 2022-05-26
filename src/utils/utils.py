@@ -4,10 +4,12 @@ import textgrids
 import pandas as pd
 from pathlib import Path
 
+
 def makedirs_for_file(acoustic_model_path):
     path = Path(acoustic_model_path)
     if not os.path.exists(path.parent):
         os.makedirs(path.parent)
+
 
 def parse_textgrid(file):
     """
@@ -21,7 +23,7 @@ def parse_textgrid(file):
     except:
         raise Exception(f'Failed on file {file}')
 
-    p =  Path(file)
+    p = Path(file)
     logid = p.parts[1] + "_" + p.stem
     utt = []
     pos = 1
@@ -33,9 +35,9 @@ def parse_textgrid(file):
             end = str(annot.xmax)
             unit = (logid, pos, phone, start, end)
             utt.append(unit)
-            pos = pos+1
-        
-    return utt 
+            pos = pos + 1
+
+    return utt
 
 
 def get_gop_alignments(path_filename):
@@ -48,7 +50,7 @@ def get_gop_alignments(path_filename):
     output_phones = []
 
     for line in open(path_filename).readlines():
-        l=line.split()
+        l = line.split()
 
         if len(l) < 2:
             print("Invalid line")
@@ -61,28 +63,24 @@ def get_gop_alignments(path_filename):
 
             while i < len(data):
                 if data[i] == "[":
-                    phone = int(data[i+1])
-                    gop_score = float(data[i+2])
+                    phone = int(data[i + 1])
+                    gop_score = float(data[i + 2])
                     phones.append(phone)
                     gop_scores.append(gop_score)
 
                     i = i + 4
 
             output_scores.append({'logid': str(logid),
-                            'gop_score': gop_scores})
+                                  'gop_score': gop_scores})
             output_phones.append({'logid': str(logid),
-                            'phones': phones})
-            
-            
-            
+                                  'phones': phones})
+
     df_gop = pd.DataFrame(output_scores).set_index("logid")
     df_phones = pd.DataFrame(output_phones).set_index("logid")
     df_final = df_gop.join(df_phones)
     df_final = df_final.apply(pd.Series.explode).reset_index()
 
-            
     return df_final
-
 
 
 def phones2dic(path):
@@ -95,12 +93,11 @@ def phones2dic(path):
     with open(path, "r") as fileHandler:
         line = fileHandler.readline()
         while line:
-            l=line.split()
+            l = line.split()
             phones_dic[int(l[1])] = l[0]
             line = fileHandler.readline()
 
     return phones_dic
-
 
 
 def pos(df):
@@ -109,12 +106,12 @@ def pos(df):
     input: any dataframe
     output: the same dataframe but changed
     """
-    dfs=[]
+    dfs = []
     df['pos'] = 0
     df_g = df.groupby('logid')
     for group, df_ in df_g:
         df_ = df_.copy()
-        df_.loc[:,'pos'] = np.arange(1, len(df_)+1, dtype=int)
+        df_.loc[:, 'pos'] = np.arange(1, len(df_) + 1, dtype=int)
         dfs.append(df_)
         df_ali_gop = pd.concat(dfs)
         df_ali_gop['id'] = df_ali_gop['logid'] + '_' + df_ali_gop['pos'].apply(str)
@@ -134,6 +131,7 @@ def generate_arguments(args_dict):
     for arg_name, value in args_dict.items():
         res = res + "--" + arg_name + " " + str(value) + " "
     return res
+
 
 def run_script(script, args_dict):
     """
