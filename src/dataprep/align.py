@@ -1,3 +1,4 @@
+import torch
 import tqdm
 from kaldi.alignment import MappedAligner
 from kaldi.fstext import SymbolTable
