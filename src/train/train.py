@@ -455,6 +455,22 @@ def main(config_dict):
 
     # Train the model
     # wandb.watch(model, log_freq=100)
+    onnx_path = 'GOP-FT.onnx'
+    if not os.path.exists(onnx_path):
+        from torch.onnx import export as ex_to_onnx
+        model.eval()
+        for _, data in enumerate(trainloader, 0):
+            features = unpack_features_from_batch(data).to(device)
+            ex_to_onnx(model,
+                       features,
+                       onnx_path,
+                       export_params=True,
+                       opset_version=14,
+                       do_constant_folding=True,
+                       input_names=['features'],
+                       output_names=['scores'],
+                       dynamic_axes={'features': {0: 'batch_size'},
+                                     'scores': {0: 'batch_size'}})
     train(model, trainloader, testloader, fold, epochs, swa_epochs, state_dict_dir, run_name, layer_amount,
           use_dropout, learning_rate, scheduler_config, swa_lr, use_clipping, batchnorm,
           norm_per_phone_and_class)
