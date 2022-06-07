@@ -1,4 +1,5 @@
 import glob
+import os.path
 import re
 
 import numpy as np
@@ -98,15 +99,16 @@ def find_best_ref(transcription, reference_list_zero, reference_list, spk):
     best_trans_corr = 0
 
     for trans_idx, trans in enumerate(reference_list):
-        if (len(trans) == len(transcription)):
+        if len(trans) == len(transcription):
             num_correct = np.sum([t == a for t, a in np.c_[trans, transcription]])
             if num_correct > best_trans_corr:
                 best_trans_corr = num_correct
                 best_trans_idx = trans_idx
 
-    if best_trans_idx == None:
-        embed()
-        raise Exception("WARNING: %s does not match with transcription" % (spk))
+    if best_trans_idx is None:
+        # embed()
+        # raise Exception("WARNING: %s does not match with transcription" % spk)
+        return [], []
 
     best_trans = reference_list[best_trans_idx]
     best_trans_zero = reference_list_zero[best_trans_idx]
@@ -117,7 +119,10 @@ def find_best_ref(transcription, reference_list_zero, reference_list, spk):
 # Returns path to specific labels file for a given utterance
 def get_labels_file_path(labels_dir_path, utterance):
     spk, _ = utterance.split("_")
-    return "%s/%s/%s/%s.txt" % (labels_dir_path, spk, "labels", utterance)
+    label_file_name = "%s/%s/%s/%s.txt" % (labels_dir_path, spk, "labels", utterance)
+    if not os.path.exists(label_file_name):
+        label_file_name = label_file_name.replace('.txt', '.csv')
+    return label_file_name
 
 
 # This function reads a single reference file and returns
@@ -161,6 +166,8 @@ def get_reference_from_system_alignments(reference_transcriptions_path, labels_d
         print("----------------------------------------------------------------------------------------")
         print("Speaker %s, sentence %s: %s (File: %s)" % (
         spk, sent, " ".join(sent_dict_complete[sent]), labels_file_path))
+        # if utterance in ['spkr112_20', 'spkr14_20']:
+        #     continue
 
         # Get reference, manual annotation and labels from reference file
         ref_labels, trans_manual, labels = get_reference(labels_file_path)
@@ -178,6 +185,8 @@ def get_reference_from_system_alignments(reference_transcriptions_path, labels_d
         print("BEST_REF_AUTO_ZERO:   " + phonelist2str(best_ref_auto_zero))
         print("TRANS_MANUAL:         " + phonelist2str(trans_manual))
         print("REF_LABELS:           " + phonelist2str(ref_labels))
+        if not best_ref_auto or not best_ref_auto_zero:
+            continue
 
         output[utterance] = {
             'trans_auto': trans_auto,
