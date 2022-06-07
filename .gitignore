@@ -5,3 +5,6 @@ wandb
 EpaDB_heldout
 EpaDB_heldout_v3
 EpaDB_heldout
+librispeech_models
+pytorch_models
+kaldi_labels
