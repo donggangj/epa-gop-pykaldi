@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import List
 from typing import Tuple, Union
@@ -136,7 +137,7 @@ class EpaDB(Dataset):
                     print("#Frames in features: ")
                     print(features.shape[0])
                     print(line)
-                    embed()
+                    # embed()
                     print(e)
                 except KeyError as e:
                     print("Bad item:")
@@ -145,7 +146,7 @@ class EpaDB(Dataset):
                     print("#Frames in features: ")
                     print(features.shape[0])
                     print(line)
-                    embed()
+                    # embed()
                     print(e)
 
         output_dict = {'features': features,

@@ -1,5 +1,9 @@
-import wandb
+# import wandb
+import os
+
 import yaml
+from torch import optim
+from torch.optim.lr_scheduler import StepLR
 from torch.optim.swa_utils import AveragedModel, SWALR
 from torch.utils.data import DataLoader
 
@@ -50,7 +54,7 @@ def log_test_loss(fold, loss, step, loss_dict):
                 'step': step}
     loss_dict = {phone: loss for phone, loss in loss_dict.items()}
     log_dict.update(get_log_dict_for_wandb_from_loss_dict(fold, loss_dict, 'test'))
-    wandb.log(log_dict)
+    # wandb.log(log_dict)
     step += 1
     return step
 
@@ -65,7 +69,7 @@ def log_and_reset_every_n_batches(fold, epoch, i, running_loss, step, n):
                     'epoch': epoch}
         # loss_dict = {phone : loss/n for phone, loss in loss_dict.items()}
         # log_dict.update(get_log_dict_for_wandb_from_loss_dict(fold, loss_dict, 'train'))
-        wandb.log(log_dict)
+        # wandb.log(log_dict)
         step += 1
         running_loss = 0.0
     return running_loss, step  # , loss_dict
@@ -287,8 +291,8 @@ def foward_backward_pass(data, model, optimizer, phone_weights, phone_int2sym, p
 
 def log_loss_if_first_batch(epoch, i, fold, loss, model, testloader, step):
     if epoch == 0 and i == 0:
-        wandb.log({'train_loss_fold_' + str(fold): loss,
-                   'step': step})
+        # wandb.log({'train_loss_fold_' + str(fold): loss,
+        #            'step': step})
         test_loss, test_loss_dict = test(model, testloader)
         step = log_test_loss(fold, test_loss, step, test_loss_dict)
 
@@ -419,8 +423,8 @@ def main(config_dict):
     device_name = config_dict["device"]
     checkpoint_step = config_dict["checkpoint-step"]
 
-    wandb.init(project="gop-finetuning", entity="pronscoring-liaa")
-    wandb.run.name = run_name
+    # wandb.init(project="gop-finetuning", entity="pronscoring-liaa")
+    # wandb.run.name = run_name
 
     trainset = EpaDB(trainset_list, phones_file, labels_dir, features_path, conf_path)
     testset = EpaDB(testset_list, phones_file, labels_dir, features_path, conf_path)
@@ -450,7 +454,7 @@ def main(config_dict):
     model.load_state_dict(state_dict['model_state_dict'])
 
     # Train the model
-    wandb.watch(model, log_freq=100)
+    # wandb.watch(model, log_freq=100)
     train(model, trainloader, testloader, fold, epochs, swa_epochs, state_dict_dir, run_name, layer_amount,
           use_dropout, learning_rate, scheduler_config, swa_lr, use_clipping, batchnorm,
           norm_per_phone_and_class)

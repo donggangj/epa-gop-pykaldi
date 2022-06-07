@@ -92,7 +92,9 @@ class CreateFinetuneModelStage(AtomicStage):
 
 
 class TrainCrossValStage(AtomicStage):
-    _name = "train"
+    def __init__(self, config_dict):
+        super().__init__(config_dict)
+        self._name = "train"
 
     def run(self):
         config_dict = self._config_dict
@@ -109,7 +111,9 @@ class TrainCrossValStage(AtomicStage):
 
 
 class TrainHeldoutStage(AtomicStage):
-    _name = "train"
+    def __init__(self, config_dict):
+        super().__init__(config_dict)
+        self._name = "train"
 
     def run(self):
         config_dict = self._config_dict
