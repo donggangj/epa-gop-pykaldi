@@ -123,4 +123,7 @@ def main(config_dict):
     feature_manager.extract_features_using_kaldi()
 
     # Create links to utterance lists in data folder
+    create_epadb_full_sample_list(data_root_path, train_list_path)
+    create_epadb_full_sample_list(data_root_path, test_list_path)
+    create_ref_labels_symlinks(data_root_path, dataprep_output_path)
     copy_sample_lists_and_reference(train_list_path, test_list_path, reference_path, dataprep_output_path)
